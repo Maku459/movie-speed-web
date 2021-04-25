@@ -69,17 +69,12 @@
   video.autoplay = true;
   video.loop = true;
   video.src = "R0010004_1.mp4";
+  video.playbackRate = 2; //再生速度調整
 
   var texture = new THREE.VideoTexture( video );
   texture.minFilter = THREE.LinearFilter;
 
   var material   = new THREE.MeshBasicMaterial( { map : texture } );
-
-    //静止画
-
-	/*var material = new THREE.MeshBasicMaterial( {
-	   map: THREE.ImageUtils.loadTexture( 'test.jpg' )
-	} );*/
 
 	sphere = new THREE.Mesh( geometry, material );
 
