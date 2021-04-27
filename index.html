@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ja">
   <head>
-    <title>Movie Panorama Example</title>
+    <title>movie-speed-web</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <style>
@@ -9,11 +9,24 @@
         margin: 0px;
         overflow: hidden;
       }
+      #selectvideobar{
+        position: fixed;
+        bottom:50px;
+        left:50px;
+        display: flex;
+      }
       #buttonbar{
         position: fixed;
         bottom:50px;
         right:50px;
         display: flex;
+      }
+      #speedbar{
+        position: fixed;
+        bottom:120px;
+        right:50px;
+        color: white;
+        font-size: 15px;
       }
       .button{
         width: 60px;
@@ -35,20 +48,26 @@
       .button:hover{
         opacity: 0.8;
       }
-      #play{
-        background:#FAAA79;
-      }
 
     </style>
   </head>
   <body>
     <div id="stage"></div>
 
+    <div id="selectvideobar">
+      <div id="video_one" class="button">1</div>
+      <div id="video_two" class="button">2</div>
+      <div id="video_three" class="button">3</div>
+    </div>
+
+    <p id="speedbar"></p>
     <div id="buttonbar">
-      <div id="play" class="button">||</div>
       <div id="speeddown" class="button"><<</div>
       <div id="speedup" class="button">>></div>
+      <div id="check" class="button">OK</div>
     </div>
+
+    <p></p>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/105/three.min.js"></script>
   <script src="./js/OrbitControls.js"></script>
@@ -73,15 +92,15 @@
     //動画
 
   var array = [0.8, 0.85, 0.9, 0.95, 1.0, 1.05, 1.1, 1.15, 1.2, 1.25, 1.3];
-  var initial_speed = array[Math.floor(Math.random() * array.length)];
+  var initialSpeed = array[Math.floor(Math.random() * array.length)];
 
   var video = document.createElement( 'video' );
   video.width = 640;
   video.height = 360;
   video.autoplay = true;
-  video.loop = true;
+  video.loop = false;
   video.src = "R0010004_1.mp4";
-  video.playbackRate = initial_speed; //再生速度調整
+  video.playbackRate = initialSpeed; //再生速度調整
 
   var texture = new THREE.VideoTexture( video );
   texture.minFilter = THREE.LinearFilter;
@@ -116,13 +135,21 @@
 
   var controls = new THREE.OrbitControls(camera, renderer.domElement);
 
+  var speedbar = document.getElementById("speedbar");
+
   function render(){
     requestAnimationFrame(render);
     window.addEventListener( 'resize', onWindowResize, false );
     renderer.render(scene,camera);
 
-    button = document.getElementById("play");
-    button.addEventListener( 'click', vidplay, false );
+    button_one = document.getElementById("video_one");
+    button_one.addEventListener( 'click', videoOne, false );
+
+    button_two = document.getElementById("video_two");
+    button_two.addEventListener( 'click', videoTwo, false );
+
+    button_three = document.getElementById("video_three");
+    button_three.addEventListener( 'click', videoThree, false );
 
     button_up = document.getElementById("speedup");
     button_up.addEventListener( 'click', speedup, true);
@@ -130,8 +157,12 @@
     button_down = document.getElementById("speeddown");
     button_down.addEventListener( 'click', speeddown);
 
+    button_check = document.getElementById("check");
+    button_check.addEventListener( 'click', speedCheck);
+
     controls.update();
   }
+
   render();
   function onWindowResize() {
 		camera.aspect = window.innerWidth / window.innerHeight;
@@ -139,18 +170,23 @@
 		renderer.setSize( window.innerWidth, window.innerHeight );
 	}
 
-  function vidplay() {
-       if (video.paused) {
-          video.play();
-          button.textContent = "||";
-          button.style.backgroundColor = "#F26964";
-          console.log("click");
-       } else {
-          video.pause();
-          button.textContent = ">";
-          button.style.backgroundColor = "#1253A4";
-       }
-    }
+  function videoOne() {
+    video.src = "R0010004_1.mp4";
+    video.play();
+    speedbar.textContent = ""
+  }
+
+  function videoTwo(){
+    video.src = "R0010002_er_1.mp4";
+    video.play();
+    speedbar.textContent = "";
+  }
+
+  function videoThree(){
+    video.src = "R0010009_er_1.mp4";
+    video.play();
+    speedbar.textContent = "";
+  }
 
   function speedup() {
     video.playbackRate += 0.05;
@@ -159,6 +195,15 @@
 
   function speeddown() {
     video.playbackRate -= 0.05;
+    console.log(video.playbackRate);
+  }
+
+  function speedCheck() {
+    //小数点の位置を2桁右に移動する
+    var num = video.playbackRate * 100;
+    //四捨五入したあと、小数点の位置を元に戻す
+    num = Math.floor(num) / 100;
+    speedbar.textContent = `${initialSpeed} → ${num}`
     console.log(video.playbackRate);
   }
     
