@@ -173,19 +173,25 @@
   function videoOne() {
     video.src = "R0010004_1.mp4";
     video.play();
-    speedbar.textContent = ""
+    speedbar.textContent = "";
+    initialSpeed = array[Math.floor(Math.random() * array.length)];
+    video.playbackRate = initialSpeed; //再生速度調整
   }
 
   function videoTwo(){
     video.src = "R0010002_er_1.mp4";
     video.play();
     speedbar.textContent = "";
+    initialSpeed = array[Math.floor(Math.random() * array.length)];
+    video.playbackRate = initialSpeed; //再生速度調整
   }
 
   function videoThree(){
     video.src = "R0010009_er_1.mp4";
     video.play();
     speedbar.textContent = "";
+    initialSpeed = array[Math.floor(Math.random() * array.length)];
+    video.playbackRate = initialSpeed; //再生速度調整
   }
 
   function speedup() {
@@ -202,7 +208,7 @@
     //小数点の位置を2桁右に移動する
     var num = video.playbackRate * 100;
     //四捨五入したあと、小数点の位置を元に戻す
-    num = Math.floor(num) / 100;
+    num = Math.round(num) / 100;
     speedbar.textContent = `${initialSpeed} → ${num}`
     console.log(video.playbackRate);
   }
