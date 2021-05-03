@@ -102,6 +102,8 @@
   video.src = "R0010004_1.mp4";
   video.playbackRate = initialSpeed; //再生速度調整
 
+  var videonum = 1;
+
   var texture = new THREE.VideoTexture( video );
   texture.minFilter = THREE.LinearFilter;
 
@@ -176,6 +178,7 @@
     speedbar.textContent = "";
     initialSpeed = array[Math.floor(Math.random() * array.length)];
     video.playbackRate = initialSpeed; //再生速度調整
+    videonum = 1;
   }
 
   function videoTwo(){
@@ -184,6 +187,7 @@
     speedbar.textContent = "";
     initialSpeed = array[Math.floor(Math.random() * array.length)];
     video.playbackRate = initialSpeed; //再生速度調整
+    videonum = 2;
   }
 
   function videoThree(){
@@ -192,6 +196,7 @@
     speedbar.textContent = "";
     initialSpeed = array[Math.floor(Math.random() * array.length)];
     video.playbackRate = initialSpeed; //再生速度調整
+    videonum = 3;
   }
 
   function speedup() {
@@ -211,6 +216,12 @@
     num = Math.round(num) / 100;
     speedbar.textContent = `${initialSpeed} → ${num}`
     console.log(video.playbackRate);
+    var datalist = {
+      video_num: videonum,
+      before: initialSpeed,
+      after: video.playbackRate
+    }
+    localStorage.setItem("datalist", JSON.stringify(datalist));
   }
     
 
