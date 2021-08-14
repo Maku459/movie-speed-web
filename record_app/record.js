@@ -13,9 +13,9 @@ $(function () {
     var pathname = location.href;
   
     var ajaxPath = `${location.protocol}//${location.host}/${folderpath}record_app/_ajax.php`;
-    var datalist = JSON.parse(localStorage.getItem("datalist"));
 
     $('#check').on('click',function(){
+      var datalist = JSON.parse(localStorage.getItem("datalist"));
       $.post(ajaxPath, {
         datalist: datalist,
         function() {

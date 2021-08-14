@@ -124,7 +124,7 @@
         <div class="close-btn" id="js-close-btn"><i class="fas fa-times"></i></div>
         <div class="popup-paragraph">
           <p><b>ランダムな速さで、360度動画が再生されます。</b></p>
-          <p><b>右下のボタンを押して、1.0倍速を目指して調整してください。</b></p>
+          <p><b>右下のボタンを押して、自然だと思う速度に調整してください。</b></p>
           <p><< を押すと速度が遅く、 >> を押すと速度が速くなります。</p>
           <p>左下のボタンは指示があるまで触らないでください。</p>
           <p>画面をドラッグすると、360度見渡すことができます。</p>
@@ -253,7 +253,7 @@
 	}
 
   function videoOne() {
-    video.src = "R0010004_1.mp4";
+    video.src = "R0010004_2.mp4";
     video.play();
     speedbar.textContent = "";
     initialSpeed = array[Math.floor(Math.random() * array.length)];
@@ -262,7 +262,7 @@
   }
 
   function videoTwo(){
-    video.src = "R0010002_er_1.mp4";
+    video.src = "R0010002_er_2.mp4";
     video.play();
     speedbar.textContent = "";
     initialSpeed = array[Math.floor(Math.random() * array.length)];
@@ -293,8 +293,10 @@
     //小数点の位置を2桁右に移動する
     var num = video.playbackRate * 100;
     //四捨五入したあと、小数点の位置を元に戻す
+    var sixteen = Math.round(num).toString(16);
     num = Math.round(num) / 100;
-    speedbar.textContent = `${initialSpeed} → ${num}`
+    var initialSixteen = Math.round(initialSpeed*100).toString(16);
+    speedbar.textContent = `${initialSixteen} → ${sixteen}`
     console.log(video.playbackRate);
     var datalist = {
       video_num: videonum,
