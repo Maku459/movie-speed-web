@@ -34,6 +34,14 @@
         color: white;
         font-size: 15px;
       }
+      #timer {
+        position: fixed;
+        bottom: 120px;
+        right: 200px;
+        color: white;
+        display: none;
+        margin-bottom: 15px;
+      }
       .button{
         width: 60px;
       	height: 60px;
@@ -124,7 +132,7 @@
         <div class="close-btn" id="js-close-btn"><i class="fas fa-times"></i></div>
         <div class="popup-paragraph">
           <p><b>ランダムな速さで、360度動画が再生されます。</b></p>
-          <p><b>右下のボタンを押して、自然だと思う速度に調整してください。</b></p>
+          <p><b>右下のボタンを押して、現実に近いと思う速度に調整してください。</b></p>
           <p><< を押すと速度が遅く、 >> を押すと速度が速くなります。</p>
           <p>左下のボタンは指示があるまで触らないでください。</p>
           <p>画面をドラッグすると、360度見渡すことができます。</p>
@@ -140,6 +148,7 @@
     </div>
 
     <p id="speedbar"></p>
+    <div id="timer">0:00</div>
     <div id="buttonbar">
       <div id="speeddown" class="button"><<</div>
       <div id="speedup" class="button">>></div>
@@ -195,15 +204,9 @@
 
   //camera
 
-  var camera = new THREE.PerspectiveCamera(75, width / height, 1, 1000);
+  var camera = new THREE.PerspectiveCamera(60, width / height, 1, 1000);
   camera.position.set(0,0,0.1);
   camera.lookAt(sphere.position);
-
-  //helper
-
-  var axis = new THREE.AxesHelper(1000);
-  axis.position.set(0,0,0);
-  scene.add(axis);
 
   //render
 
@@ -218,6 +221,50 @@
   var controls = new THREE.OrbitControls(camera, renderer.domElement);
 
   var speedbar = document.getElementById("speedbar");
+
+  //timer
+  var startTime;
+  var elapsedTime = 0; //経過時刻ms
+  //タイマーを止めるにはclearTimeoutを使う必要があり、そのためにはclearTimeoutの引数に渡すためのタイマーのidが必要
+  var timerId;
+  //タイマーをストップ -> 再開させたら0になってしまうのを避けるための変数。
+  var timeToadd = 0;
+
+  function updateTimetText(){
+    var m = Math.floor(elapsedTime / 60000);
+    var s = Math.floor(elapsedTime % 60000 / 1000);
+
+    //HTML 上で表示の際の桁数を固定する　例）3 => 03　、 12 -> 012
+    //javascriptでは文字列数列を連結すると文字列になる
+    //文字列の末尾2桁を表示したいのでsliceで負の値(-2)引数で渡してやる。
+    m = ('0' + m).slice(-2); 
+    s = ('0' + s).slice(-2);
+
+    //HTMLのid　timer部分に表示させる　
+    timer.textContent = m + ':' + s;
+  }
+
+  function countUp(){
+    //timerId変数はsetTimeoutの返り値になるので代入する
+    timerId = setTimeout(function(){
+
+        //経過時刻は現在時刻をミリ秒で示すDate.now()からstartを押した時の時刻(startTime)を引く
+        elapsedTime = Date.now() - startTime + timeToadd;
+        updateTimetText()
+
+        //countUp関数自身を呼ぶことで10ミリ秒毎に以下の計算を始める
+        countUp();
+
+    //1秒以下の時間を表示するために10ミリ秒後に始めるよう宣言
+    },10);
+  }
+
+  function resetTimer (){
+    elapsedTime = 0;
+    timeToadd = 0;
+    updateTimetText();
+    $('#timer').css('display','none');
+  }
 
   function render(){
     requestAnimationFrame(render);
@@ -253,30 +300,45 @@
 	}
 
   function videoOne() {
-    video.src = "R0010004_2.mp4";
+    video.src = "shibuya_2_er_trim_hole_90.mp4";
     video.play();
     speedbar.textContent = "";
     initialSpeed = array[Math.floor(Math.random() * array.length)];
     video.playbackRate = initialSpeed; //再生速度調整
     videonum = 1;
+
+    resetTimer();
+    //現在時刻を示すDate.nowを代入
+    startTime = Date.now();
+    countUp();
   }
 
   function videoTwo(){
-    video.src = "R0010002_er_2.mp4";
+    video.src = "wheel_1_er_trim_hole_90.mp4";
     video.play();
     speedbar.textContent = "";
     initialSpeed = array[Math.floor(Math.random() * array.length)];
     video.playbackRate = initialSpeed; //再生速度調整
     videonum = 2;
+
+    resetTimer();
+    //現在時刻を示すDate.nowを代入
+    startTime = Date.now();
+    countUp();
   }
 
   function videoThree(){
-    video.src = "R0010009_er_1.mp4";
+    video.src = "wheel_2_er_trim_hole_90.mp4";
     video.play();
     speedbar.textContent = "";
     initialSpeed = array[Math.floor(Math.random() * array.length)];
     video.playbackRate = initialSpeed; //再生速度調整
     videonum = 3;
+
+    resetTimer();
+    //現在時刻を示すDate.nowを代入
+    startTime = Date.now();
+    countUp();
   }
 
   function speedup() {
@@ -304,6 +366,15 @@
       after: video.playbackRate
     }
     localStorage.setItem("datalist", JSON.stringify(datalist));
+
+     //タイマーを止めるにはclearTimeoutを使う必要があり、そのためにはclearTimeoutの引数に渡すためのタイマーのidが必要
+    clearTimeout(timerId);
+    $('#timer').css('display','block');
+
+    //タイマーに表示される時間elapsedTimeが現在時刻かたスタートボタンを押した時刻を引いたものなので、
+    //タイマーを再開させたら0になってしまう。elapsedTime = Date.now - startTime
+    //それを回避するためには過去のスタート時間からストップ時間までの経過時間を足してあげなければならない。elapsedTime = Date.now - startTime + timeToadd (timeToadd = ストップを押した時刻(Date.now)から直近のスタート時刻(startTime)を引く)
+    timeToadd += Date.now() - startTime;
   }
     
 
