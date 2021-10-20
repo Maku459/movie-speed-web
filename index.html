@@ -21,6 +21,12 @@
         left:50px;
         display: flex;
       }
+      #rotatebar{
+        position: fixed;
+        bottom:50px;
+        left: calc(50% - 70px);
+        display: flex;
+      }
       #buttonbar{
         position: fixed;
         bottom:50px;
@@ -41,6 +47,10 @@
         color: white;
         display: none;
         margin-bottom: 15px;
+      }
+      #left {
+        -webkit-transform: rotate(180deg);
+        transform: rotate(180deg);
       }
       .button{
         width: 60px;
@@ -120,6 +130,9 @@
         z-index: 1;
         cursor: pointer;
       }
+      .blue {
+        background-color: #6495ed;
+      }
 
     </style>
   </head>
@@ -132,7 +145,7 @@
         <div class="close-btn" id="js-close-btn"><i class="fas fa-times"></i></div>
         <div class="popup-paragraph">
           <p><b>ランダムな速さで、360度動画が再生されます。</b></p>
-          <p><b>右下のボタンを押して、現実に近いと思う速度に調整してください。</b></p>
+          <p><b>右下のボタンを押して、実世界と同じ速度に感じるように調整してください。</b></p>
           <p><< を押すと速度が遅く、 >> を押すと速度が速くなります。</p>
           <p>左下のボタンは指示があるまで触らないでください。</p>
           <p>画面をドラッグすると、360度見渡すことができます。</p>
@@ -146,6 +159,12 @@
       <div id="video_two" class="button">2</div>
       <div id="video_three" class="button">3</div>
     </div>
+    <!--
+    <div id="rotatebar">
+      <div id="left" class="button blue">⤴︎</div>
+      <div id="right" class="button blue">⤵︎</div>
+    </div>
+    -->
 
     <p id="speedbar"></p>
     <div id="timer">0:00</div>
@@ -180,7 +199,8 @@
 
     //動画
 
-  var array = [0.8, 0.85, 0.9, 0.95, 1.0, 1.05, 1.1, 1.15, 1.2];
+  //var array = [0.8, 0.85, 0.9, 0.95, 1.0, 1.05, 1.1, 1.15, 1.2];
+  var array = [0.5, 0.6, 0.7, 0.8, 1.2, 1.3, 1.4, 1.5];
   var initialSpeed = array[Math.floor(Math.random() * array.length)];
 
   var video = document.createElement( 'video' );
@@ -227,8 +247,6 @@
   var elapsedTime = 0; //経過時刻ms
   //タイマーを止めるにはclearTimeoutを使う必要があり、そのためにはclearTimeoutの引数に渡すためのタイマーのidが必要
   var timerId;
-  //タイマーをストップ -> 再開させたら0になってしまうのを避けるための変数。
-  var timeToadd = 0;
 
   function updateTimetText(){
     var m = Math.floor(elapsedTime / 60000);
@@ -249,7 +267,7 @@
     timerId = setTimeout(function(){
 
         //経過時刻は現在時刻をミリ秒で示すDate.now()からstartを押した時の時刻(startTime)を引く
-        elapsedTime = Date.now() - startTime + timeToadd;
+        elapsedTime = Date.now() - startTime;
         updateTimetText()
 
         //countUp関数自身を呼ぶことで10ミリ秒毎に以下の計算を始める
@@ -261,7 +279,6 @@
 
   function resetTimer (){
     elapsedTime = 0;
-    timeToadd = 0;
     updateTimetText();
     $('#timer').css('display','none');
   }
@@ -280,6 +297,14 @@
     button_three = document.getElementById("video_three");
     button_three.addEventListener( 'click', videoThree, false );
 
+    /*
+    button_left = document.getElementById("left");
+    button_left.addEventListener( 'click', rotateLeft);
+
+    button_right = document.getElementById("right");
+    button_right.addEventListener( 'click', rotateRight);
+    */
+    
     button_up = document.getElementById("speedup");
     button_up.addEventListener( 'click', speedup, true);
 
@@ -306,7 +331,7 @@
     initialSpeed = array[Math.floor(Math.random() * array.length)];
     video.playbackRate = initialSpeed; //再生速度調整
     videonum = 1;
-
+    clearTimeout(timerId);
     resetTimer();
     //現在時刻を示すDate.nowを代入
     startTime = Date.now();
@@ -320,7 +345,7 @@
     initialSpeed = array[Math.floor(Math.random() * array.length)];
     video.playbackRate = initialSpeed; //再生速度調整
     videonum = 2;
-
+    clearTimeout(timerId);
     resetTimer();
     //現在時刻を示すDate.nowを代入
     startTime = Date.now();
@@ -334,11 +359,19 @@
     initialSpeed = array[Math.floor(Math.random() * array.length)];
     video.playbackRate = initialSpeed; //再生速度調整
     videonum = 3;
-
+    clearTimeout(timerId);
     resetTimer();
     //現在時刻を示すDate.nowを代入
     startTime = Date.now();
     countUp();
+  }
+
+  function rotateLeft() {
+    camera.rotation.x = 0.2;
+  }
+
+  function rotateRight() {
+    camera.rotation.z = 0.2;
   }
 
   function speedup() {
@@ -370,11 +403,6 @@
      //タイマーを止めるにはclearTimeoutを使う必要があり、そのためにはclearTimeoutの引数に渡すためのタイマーのidが必要
     clearTimeout(timerId);
     $('#timer').css('display','block');
-
-    //タイマーに表示される時間elapsedTimeが現在時刻かたスタートボタンを押した時刻を引いたものなので、
-    //タイマーを再開させたら0になってしまう。elapsedTime = Date.now - startTime
-    //それを回避するためには過去のスタート時間からストップ時間までの経過時間を足してあげなければならない。elapsedTime = Date.now - startTime + timeToadd (timeToadd = ストップを押した時刻(Date.now)から直近のスタート時刻(startTime)を引く)
-    timeToadd += Date.now() - startTime;
   }
     
 
