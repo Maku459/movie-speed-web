@@ -13,6 +13,7 @@ window.onload = function() {
       if(!elem) return;
       elem.addEventListener('click', function() {
         popup.classList.remove('is-show');
+        document.body.requestFullscreen(); 
       })
     }
   }

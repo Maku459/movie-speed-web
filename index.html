@@ -94,14 +94,15 @@
   var material   = new THREE.MeshBasicMaterial( { map : texture } );
 
 	sphere = new THREE.Mesh( geometry, material );
-
+  
 	scene.add( sphere );
 
   //camera
 
   var camera = new THREE.PerspectiveCamera(60, width / height, 1, 1000);
   camera.position.set(0,0,0.1);
-  camera.lookAt(sphere.position);
+  camera.rotation.y =  Math.PI/2;
+  //camera.lookAt(sphere.position);
 
   //render
 
@@ -159,9 +160,6 @@
   }
 
   function render(){
-    if(!window.fullScreen){
-      document.body.requestFullscreen(); 
-    }
     requestAnimationFrame(render);
     window.addEventListener( 'resize', onWindowResize, false );
     renderer.render(scene,camera);
@@ -203,7 +201,7 @@
 	}
 
   function videoOne() {
-    video.src = "shibuya_2_er_trim_hole_90.mp4";
+    video.src = "shibuya_2_er_trim_hole_90_rotate.mp4";
     video.play();
     speedbar.textContent = "";
     initialSpeed = array[Math.floor(Math.random() * array.length)];
@@ -217,7 +215,7 @@
   }
 
   function videoTwo(){
-    video.src = "wheel_1_er_trim_hole_90.mp4";
+    video.src = "wheel_1_er_trim_hole_90_rotate.mp4";
     video.play();
     speedbar.textContent = "";
     initialSpeed = array[Math.floor(Math.random() * array.length)];
@@ -231,7 +229,7 @@
   }
 
   function videoThree(){
-    video.src = "wheel_2_er_trim_hole_90.mp4";
+    video.src = "wheel_2_er_trim_hole_90_rotate.mp4";
     video.play();
     speedbar.textContent = "";
     initialSpeed = array[Math.floor(Math.random() * array.length)];
